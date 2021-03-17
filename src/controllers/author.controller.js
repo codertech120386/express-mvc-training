@@ -3,44 +3,24 @@ const router = express.Router();
 
 const Author = require("../models/author.model");
 const Tag = require("../models/tag.model");
+const Post = require("../models/post.model");
+const Comment = require("../models/comment.model");
 
-// Create a new author
-router.post("/", async (req, res) => {
-  const author = await Author.create(req.body);
-  res.status(201).json({ data: author });
-});
+const crudController = require("./crud.controller");
 
-// Fetch all authors
-router.get("/", async (req, res) => {
-  const authors = await Author.find({});
-  res.status(200).json({ data: authors });
-});
+router.post("/", async (req, res) => crudController(Author).post(req, res));
 
-// Fetch a Single Author By Id
-router.get("/:id", async (req, res) => {
-  const author = await Author.findById(req.params.id);
-  res.status(200).json({ data: author });
-});
+router.get("/", async (req, res) => crudController(Author).get(req, res));
 
-// Update an existing author by Id
-router.patch("/:id", async (req, res) => {
-  const author = await Author.findOneAndUpdate(
-    { _id: req.params.id },
-    req.body,
-    {
-      new: true,
-    }
-  )
-    .lean()
-    .exec();
-  res.status(200).json({ data: author });
-});
+router.get("/:id", async (req, res) => crudController(Author).getOne(req, res));
 
-// Delete a Single Author by Id
-router.delete("/:id", async (req, res) => {
-  const author = await Author.findOneAndRemove(req.params.id);
-  res.status(200).json({ data: author });
-});
+router.patch("/:id", async (req, res) =>
+  crudController(Author).updateOne(req, res)
+);
+
+router.delete("/:id", async (req, res) =>
+  crudController(Author).removeOne(req, res)
+);
 
 // Fetch all tags of an author
 router.get("/:id/tags", async (req, res) => {
@@ -51,6 +31,20 @@ router.get("/:id/tags", async (req, res) => {
     .exec();
   const data = { tags };
   res.status(200).json({ data });
+});
+
+// Fetch all posts by an author
+router.get("/:id/posts", async (req, res) => {
+  const posts = await Post.find({ author: req.params.id }).populate("author");
+  res.status(200).json({ data: posts });
+});
+
+// Fetch all comments by an author
+router.get("/:id/comments", async (req, res) => {
+  const comments = await Comment.find({ author: req.params.id }).populate(
+    "author"
+  );
+  res.status(200).json({ data: comments });
 });
 
 module.exports = router;

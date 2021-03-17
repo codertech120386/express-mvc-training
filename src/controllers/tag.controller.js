@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 const Tag = require("../models/tag.model");
+const Post = require("../models/post.model");
 
 // Create a new tag
 router.post("/", async (req, res) => {
@@ -39,6 +40,12 @@ router.patch("/:id", async (req, res) => {
 router.delete("/:id", async (req, res) => {
   const tag = await Tag.findOneAndRemove(req.params.id);
   res.status(200).json({ data: tag });
+});
+
+// Fetch all posts by a tag
+router.get("/:id/posts", async (req, res) => {
+  const posts = await Post.find({ tags: req.params.id }).populate("tag");
+  res.status(200).json({ data: posts });
 });
 
 module.exports = router;

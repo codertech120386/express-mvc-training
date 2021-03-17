@@ -12,6 +12,4 @@ const tagSchema = mongoose.Schema(
   { versionKey: false }
 );
 
-const Tag = mongoose.model("tag", tagSchema);
-
-module.exports = Tag;
+module.exports = mongoose.model("tag", tagSchema);
